@@ -2,6 +2,8 @@
 
 通用版飞书长连接机器人：填入飞书 `App ID` / `App Secret` 后，飞书消息会交给本机 Claude Code 执行并把结果回到飞书。
 
+> 本仓库及代码由 AI 自动创建。代码的准确性、完整性、安全性和特定用途适用性不作保证；使用前请自行审查和验证，使用风险自负。
+
 ## 特性
 
 - 一条 `install.sh` 完成依赖安装、飞书凭据写入和服务启动。
@@ -118,3 +120,7 @@ tail -f data/gateway.log
 - **Claude 提示 "Something went wrong / use /new"**：查看上面 `[claude:xxxx]` 开头的 stderr，通常是模型不可用或会话错乱。删掉 `data/sessions.json` 对应键值后重试。
 - **授权卡片 deny "bot unreachable"**：`APPROVAL_PORT` 占用，换一个端口或杀掉占用进程。
 - **root 用户 `--dangerously-skip-permissions cannot be used with root/sudo`**：本 bot 不使用该 flag。如果你在 `CLAUDE_EXTRA_ARGS` 里手动加了，去掉。
+
+## License
+
+MIT
