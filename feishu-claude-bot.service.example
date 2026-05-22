@@ -1,0 +1,17 @@
+[Unit]
+Description=Feishu Claude Bot Gateway
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/feishu-claude-bot
+Environment=PATH=/root/.hermes/node/bin:/root/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ExecStart=/root/.hermes/node/bin/node /root/feishu-claude-bot/src/server.js
+Restart=always
+RestartSec=3
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target

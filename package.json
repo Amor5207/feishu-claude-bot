@@ -1,0 +1,17 @@
+{
+  "name": "feishu-claude-bot",
+  "version": "0.1.0",
+  "description": "Feishu long-connection bot that routes messages to local Claude Code CLI.",
+  "license": "MIT",
+  "author": "lixiaofei2001 <lixiaofei2001@qq.com>",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "keywords": ["claude", "claudecode", "feishu", "lark", "bot"],
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "@larksuiteoapi/node-sdk": "^1.62.1"
+  }
+}
