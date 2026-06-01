@@ -7,11 +7,18 @@
   "scripts": {
     "start": "node src/server.js"
   },
-  "keywords": ["claude", "claudecode", "feishu", "lark", "bot"],
+  "keywords": [
+    "claude",
+    "claudecode",
+    "feishu",
+    "lark",
+    "bot"
+  ],
   "engines": {
     "node": ">=22.0.0"
   },
   "dependencies": {
-    "@larksuiteoapi/node-sdk": "^1.62.1"
+    "@larksuiteoapi/node-sdk": "^1.62.1",
+    "axios": "~1.13.3"
   }
 }

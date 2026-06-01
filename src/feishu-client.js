@@ -599,10 +599,43 @@ function buildStatusElement(content) {
   };
 }
 
-function formatStatusFooter({ status, elapsedMs, isError = false }) {
-  const elapsed = formatShortElapsed(elapsedMs);
-  const content = elapsed ? `状态：${status} · ${elapsed}` : `状态：${status}`;
-  return isError ? `<font color='red'>${content}</font>` : content;
+const PROCESSING_DOT_FRAMES = ["·", "··", "···"];
+
+function nowClock() {
+  try {
+    return new Date().toLocaleTimeString("zh-CN", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      timeZone: "Asia/Shanghai"
+    });
+  } catch {
+    const d = new Date();
+    return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  }
+}
+
+// Footer 样式参考 Hermes：处理中显示三点交替动画（正在处理 ·/··/···），
+// 完成显示「✅ 已完成 · 耗时X · 时刻」，出错红字。
+function formatStatusFooter({ status, elapsedMs, isError = false, final = false }) {
+  const isFinal = final || isError || status === "已完成" || status === "出错" || status === "已取消";
+  if (isFinal) {
+    const icon = isError ? "❌" : "✅";
+    const parts = [`${icon} ${status}`];
+    const elapsed = formatShortElapsed(elapsedMs);
+    if (elapsed) parts.push(`耗时 ${elapsed}`);
+    parts.push(nowClock());
+    const content = parts.join(" · ");
+    return isError
+      ? `<font color='red'>${content}</font>`
+      : `<font color='grey'>${content}</font>`;
+  }
+  // 处理中：三点交替动画（按耗时算帧，约每 350ms 换一帧）
+  const frame = Math.floor((Number(elapsedMs) || 0) / 350) % PROCESSING_DOT_FRAMES.length;
+  const dots = PROCESSING_DOT_FRAMES[frame];
+  const label =
+    status === "排队中" ? "排队中" : status === "解析附件" ? "解析附件" : "正在处理";
+  return `<font color='grey'>${label} ${dots}</font>`;
 }
 
 function formatShortElapsed(ms) {

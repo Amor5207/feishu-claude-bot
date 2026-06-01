@@ -150,9 +150,14 @@ async function processMessage(event, incoming, acceptedCardSession = null) {
     const finalText = result.finalText || answer || "(empty)";
     const { displayText, attachments } = extractAttachmentRequests(finalText, config.workdir);
     const { inlineImages, remainingAttachments } = await prepareInlineImages(attachments);
-    const cardText =
+    let cardText =
       displayText
       || (inlineImages.length || remainingAttachments.length ? "已生成附件。" : finalText);
+    // 在卡片里列出非图片附件名（图片已内嵌可预览），让用户一眼看到生成了什么文件
+    if (remainingAttachments.length) {
+      const names = remainingAttachments.map((a) => `\`${a.name}\``).join(" · ");
+      cardText += `\n\n📎 附件（${remainingAttachments.length}）：${names}`;
+    }
     if (cardSession) {
       await cardSession.finalize({
         text: cardText,
