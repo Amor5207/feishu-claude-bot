@@ -156,7 +156,7 @@ async function processMessage(event, incoming, acceptedCardSession = null) {
     // 在卡片里列出非图片附件名（图片已内嵌可预览），让用户一眼看到生成了什么文件
     if (remainingAttachments.length) {
       const names = remainingAttachments.map((a) => `\`${a.name}\``).join(" · ");
-      cardText += `\n\n📎 附件（${remainingAttachments.length}）：${names}`;
+      cardText += `\n\n附件（${remainingAttachments.length}）：${names}`;
     }
     if (cardSession) {
       await cardSession.finalize({

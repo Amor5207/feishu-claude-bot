@@ -537,6 +537,16 @@ function buildStreamingCard() {
           margin: "0px 0px 0px 0px",
           element_id: STREAMING_CONTENT_ELEMENT_ID
         },
+        {
+          tag: "markdown",
+          content: " ",
+          icon: {
+            tag: "custom_icon",
+            img_key: LOADING_ICON_KEY,
+            size: "16px 16px"
+          },
+          element_id: LOADING_ICON_ELEMENT_ID
+        },
         buildStatusElement(formatStatusFooter({ status: "排队中", elapsedMs: 0 }))
       ]
     }
@@ -599,7 +609,9 @@ function buildStatusElement(content) {
   };
 }
 
-const PROCESSING_DOT_FRAMES = ["·", "··", "···"];
+// 飞书 CardKit 流式卡片官方加载动画图标（跨应用通用 img_key，同 Hermes）
+const LOADING_ICON_KEY = "img_v3_02vb_496bec09-4b43-4773-ad6b-0cdd103cd2bg";
+const LOADING_ICON_ELEMENT_ID = "loading_icon";
 
 function nowClock() {
   try {
@@ -615,13 +627,12 @@ function nowClock() {
   }
 }
 
-// Footer 样式参考 Hermes：处理中显示三点交替动画（正在处理 ·/··/···），
-// 完成显示「✅ 已完成 · 耗时X · 时刻」，出错红字。
+// 加载动画用官方 loading_icon 元素（见 buildStreamingCard）；这里只渲染状态文字。
+// 处理中：灰色子状态文字（无动画点、无 emoji）；完成/出错：自写文案「已完成 · 耗时X · 时刻」。
 function formatStatusFooter({ status, elapsedMs, isError = false, final = false }) {
   const isFinal = final || isError || status === "已完成" || status === "出错" || status === "已取消";
   if (isFinal) {
-    const icon = isError ? "❌" : "✅";
-    const parts = [`${icon} ${status}`];
+    const parts = [status];
     const elapsed = formatShortElapsed(elapsedMs);
     if (elapsed) parts.push(`耗时 ${elapsed}`);
     parts.push(nowClock());
@@ -630,12 +641,8 @@ function formatStatusFooter({ status, elapsedMs, isError = false, final = false 
       ? `<font color='red'>${content}</font>`
       : `<font color='grey'>${content}</font>`;
   }
-  // 处理中：三点交替动画（按耗时算帧，约每 350ms 换一帧）
-  const frame = Math.floor((Number(elapsedMs) || 0) / 350) % PROCESSING_DOT_FRAMES.length;
-  const dots = PROCESSING_DOT_FRAMES[frame];
-  const label =
-    status === "排队中" ? "排队中" : status === "解析附件" ? "解析附件" : "正在处理";
-  return `<font color='grey'>${label} ${dots}</font>`;
+  const label = status === "处理中" ? "正在处理" : status;
+  return `<font color='grey'>${label}</font>`;
 }
 
 function formatShortElapsed(ms) {
