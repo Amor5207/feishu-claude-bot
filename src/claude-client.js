@@ -134,7 +134,11 @@ class ClaudeCodeClient {
           return;
         }
         if (code !== 0) {
-          const tail = stderrBuf.trim().slice(-1200) || `exit code ${code} signal ${signal}`;
+          // Claude CLI may emit a structured JSON error/result on stdout and
+          // still exit non-zero (for example rate limits). Prefer that message
+          // over the opaque "exit code 1" so Feishu users see the real reason.
+          const structured = [resultError, answer].filter(Boolean).join("：").trim();
+          const tail = structured || stderrBuf.trim().slice(-1200) || `exit code ${code} signal ${signal}`;
           reject(new Error(`Claude 退出异常：${tail}`));
           return;
         }
@@ -185,8 +189,17 @@ class ClaudeCodeClient {
       if (this.config.claude.autoApproveTools.length) {
         args.push("--allowedTools", ...this.config.claude.autoApproveTools);
       }
-    } else if (this.config.claude.permissionMode) {
-      args.push("--permission-mode", this.config.claude.permissionMode);
+    } else {
+      // No approval cards: run with a permission mode plus an explicit
+      // --allowedTools list so the listed tools (Bash/Edit/Write/...) run
+      // without prompting. (bypassPermissions is refused under root, so we use
+      // acceptEdits + allowedTools instead.)
+      if (this.config.claude.permissionMode) {
+        args.push("--permission-mode", this.config.claude.permissionMode);
+      }
+      if (this.config.claude.autoApproveTools.length) {
+        args.push("--allowedTools", ...this.config.claude.autoApproveTools);
+      }
     }
 
     if (this.config.claude.model) args.push("--model", this.config.claude.model);
